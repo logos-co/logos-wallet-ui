@@ -1,0 +1,26 @@
+{
+  "name": "wallet_ui",
+  "version": "1.0.0",
+  "description": "Wallet interface for the Logos application",
+  "author": "Logos Core Team",
+  "type": "ui",
+  "main": "wallet_ui",
+  "dependencies": ["wallet_module"],
+  "category": "wallet",
+  "build": {
+    "type": "cmake",
+    "files": [
+      "src/wallet_ui_plugin.cpp",
+      "src/wallet_ui_plugin.h",
+      "src/walletwindow.cpp",
+      "src/walletwindow.h",
+      "src/walletwidget.cpp",
+      "src/walletwidget.h",
+      "src/wallet_ui_resources.qrc"
+    ]
+  },
+  "capabilities": [
+    "ui_components",
+    "wallet"
+  ]
+} 
