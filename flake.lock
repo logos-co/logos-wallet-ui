@@ -3,17 +3,17 @@
     "go-wallet-sdk": {
       "flake": false,
       "locked": {
-        "lastModified": 1764275000,
-        "narHash": "sha256-4JXzlUbx3VEXEwu8kSLdsl85/dyJQ7AzHvmFPPpAW1E=",
+        "lastModified": 1765213122,
+        "narHash": "sha256-C3wC+3jCKz/Brz9RHw7MmVrglgsD8/gcPocWGW1rFhs=",
         "owner": "status-im",
         "repo": "go-wallet-sdk",
-        "rev": "1739c1592948f4ba34026b73b9b1b54655d07c32",
+        "rev": "ec80b3239050fa23c5b440a01e7dc476fee47a2c",
         "type": "github"
       },
       "original": {
         "owner": "status-im",
         "repo": "go-wallet-sdk",
-        "rev": "1739c1592948f4ba34026b73b9b1b54655d07c32",
+        "rev": "ec80b3239050fa23c5b440a01e7dc476fee47a2c",
         "type": "github"
       }
     },
@@ -28,11 +28,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1761847353,
-        "narHash": "sha256-ByAhRTSYxNnEoUEYSmht9nnDMnx2BCWzJav31dwFucU=",
+        "lastModified": 1764708348,
+        "narHash": "sha256-UNyZJYZsYD1KfcKS4jQab0GWx8vxZScboo3y3JcFPv4=",
         "owner": "logos-co",
         "repo": "logos-capability-module",
-        "rev": "47836a396591126cc2a339f8d906eb4e3835fc25",
+        "rev": "710992469b7650110e7bb5a000ae03a7e8864e66",
         "type": "github"
       },
       "original": {
@@ -82,11 +82,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1761230734,
-        "narHash": "sha256-CMRUwXH7pJZ1OI6bd/TDDDXKqQ1tQZHQEOOwK8TgYHI=",
+        "lastModified": 1764699992,
+        "narHash": "sha256-nCmK9C9F31cHvy6lWKR5WGl99aJbS3kIsROAoZ4OrwI=",
         "owner": "logos-co",
         "repo": "logos-cpp-sdk",
-        "rev": "4b143922c190df00bb3835441c9f0075cb28283b",
+        "rev": "5d0bbd0d1e00aad0532ffa7c8bf2c80f460a4f6d",
         "type": "github"
       },
       "original": {
@@ -100,11 +100,11 @@
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "lastModified": 1761230734,
-        "narHash": "sha256-CMRUwXH7pJZ1OI6bd/TDDDXKqQ1tQZHQEOOwK8TgYHI=",
+        "lastModified": 1764699992,
+        "narHash": "sha256-nCmK9C9F31cHvy6lWKR5WGl99aJbS3kIsROAoZ4OrwI=",
         "owner": "logos-co",
         "repo": "logos-cpp-sdk",
-        "rev": "4b143922c190df00bb3835441c9f0075cb28283b",
+        "rev": "5d0bbd0d1e00aad0532ffa7c8bf2c80f460a4f6d",
         "type": "github"
       },
       "original": {
@@ -183,11 +183,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1761845775,
-        "narHash": "sha256-ulK8xq05ejK6qIgZ7WtWb/MJt2rk5BKfDA2z7mM3wq8=",
+        "lastModified": 1764788130,
+        "narHash": "sha256-ieu55pelIMUO/m7fLXUS3JT6sNBBHva0lNc1GRH2hb0=",
         "owner": "logos-co",
         "repo": "logos-liblogos",
-        "rev": "a92c2c1268bc70764c8f73c7bce07d21024f5af9",
+        "rev": "3046aa6ac4392a705b2890adec405d7c9d8d4178",
         "type": "github"
       },
       "original": {
@@ -232,17 +232,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1764275198,
-        "narHash": "sha256-5af7zprmWrRdrKjH0h09egxtY64RssoMSZHjH60snxw=",
+        "lastModified": 1765221049,
+        "narHash": "sha256-Hz01L5gDRqNc6pK7CrxSU0MtZad99bcfg0d943u9onA=",
         "owner": "logos-co",
         "repo": "logos-wallet-module",
-        "rev": "14819179081dea6607aa49ce45f3997355f813aa",
+        "rev": "7313233e61efe7e0648ac69309f3650656d23963",
         "type": "github"
       },
       "original": {
         "owner": "logos-co",
         "repo": "logos-wallet-module",
-        "rev": "14819179081dea6607aa49ce45f3997355f813aa",
+        "rev": "7313233e61efe7e0648ac69309f3650656d23963",
         "type": "github"
       }
     },

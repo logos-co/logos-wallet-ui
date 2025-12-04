@@ -24,12 +24,18 @@ public:
     void stopWallet();
 
 private slots:
+    void onRpcCallButtonClicked();
     void onChainIDButtonClicked();
     void onEthBalanceButtonClicked();
 
 private:
     // UI elements
     QVBoxLayout* mainLayout;
+
+    QPushButton* rpcCallButton;
+    QLineEdit* rpcCallMethodInput;
+    QLineEdit* rpcCallParamsInput;
+    QLabel* rpcCallResultLabel;
 
     QPushButton* chainIDButton;
     QLabel* chainIDLabel;
