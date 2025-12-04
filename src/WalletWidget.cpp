@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QDateTime>
 #include <QMessageBox>
+#include <QJsonArray>
 #include <iostream>
 #include <csignal>
 #include <QTimer>
@@ -53,6 +54,34 @@ WalletWidget::WalletWidget(QWidget* parent)
     // Add status label to layout
     statusLayout->addWidget(statusLabel);
 
+    // Create RPC Call frame
+    QFrame* rpcCallFrame = new QFrame(this);
+    QVBoxLayout* rpcCallLayout = new QVBoxLayout(rpcCallFrame);
+    rpcCallFrame->setLayout(rpcCallLayout);
+    rpcCallFrame->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+    rpcCallFrame->setLineWidth(1);
+
+    // Create RPC Call button
+    rpcCallButton = new QPushButton("RPC Call", this);
+
+    // Create RPC Call method input
+    rpcCallMethodInput = new QLineEdit(this);
+    rpcCallMethodInput->setPlaceholderText("Enter RPC Call Method...");
+
+    // Create RPC Call params input
+    rpcCallParamsInput = new QLineEdit(this);
+    rpcCallParamsInput->setPlaceholderText("Enter RPC Call Params...");
+
+    // Create RPC Call result label
+    rpcCallResultLabel = new QLabel("RPC Call Result: Not initialized", this);
+    rpcCallResultLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+
+    // Add RPC Call components to layout
+    rpcCallLayout->addWidget(rpcCallButton);
+    rpcCallLayout->addWidget(rpcCallMethodInput);
+    rpcCallLayout->addWidget(rpcCallParamsInput);
+    rpcCallLayout->addWidget(rpcCallResultLabel);
+
     // Create Chain ID frame
     QFrame* chainIDFrame = new QFrame(this);
     QVBoxLayout* chainIDLayout = new QVBoxLayout(chainIDFrame);
@@ -100,6 +129,7 @@ WalletWidget::WalletWidget(QWidget* parent)
 
     // Add all components to main layout
     mainLayout->addWidget(statusFrame);
+    mainLayout->addWidget(rpcCallFrame);
     mainLayout->addWidget(chainIDFrame);
     mainLayout->addWidget(ethBalanceFrame);
     mainLayout->addStretch();
@@ -109,6 +139,7 @@ WalletWidget::WalletWidget(QWidget* parent)
     mainLayout->setContentsMargins(20, 20, 20, 20);
     
     // Connect signals to slots
+    connect(rpcCallButton, &QPushButton::clicked, this, &WalletWidget::onRpcCallButtonClicked);
     connect(chainIDButton, &QPushButton::clicked, this, &WalletWidget::onChainIDButtonClicked);
     connect(ethBalanceButton, &QPushButton::clicked, this, &WalletWidget::onEthBalanceButtonClicked);
 
@@ -157,6 +188,14 @@ void WalletWidget::stopWallet() {
     // Disable UI components
     chainIDButton->setEnabled(false);
     ethBalanceButton->setEnabled(false);
+}
+
+void WalletWidget::onRpcCallButtonClicked() {
+    rpcCallResultLabel->setText("RPC Call Result: Calling...");
+    QString method = rpcCallMethodInput->text();
+    QString paramsString = rpcCallParamsInput->text();
+    QString result = logos->wallet_module.rpcCall("", method, paramsString);
+    rpcCallResultLabel->setText("RPC Call Result: " + result);
 }
 
 void WalletWidget::onChainIDButtonClicked() {
