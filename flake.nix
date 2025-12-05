@@ -6,7 +6,8 @@
     nixpkgs.follows = "logos-liblogos/nixpkgs";
     logos-cpp-sdk.url = "github:logos-co/logos-cpp-sdk";
     logos-liblogos.url = "github:logos-co/logos-liblogos";
-    logos-wallet-module.url = "github:logos-co/logos-wallet-module/b7b7189294947fc89267e01b02718a76b09344db";
+    #logos-wallet-module.url = "github:logos-co/logos-wallet-module/47be7f47039f82a4c649283e9eb9446174c7663d";
+    logos-wallet-module.url = "path:/Users/dlipicar/repos/logos-wallet-module";
     logos-capability-module.url = "github:logos-co/logos-capability-module";
   };
 

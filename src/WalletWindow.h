@@ -15,9 +15,6 @@ public:
 
 private slots:
     void onAboutAction();
-    //void onInitWaku();
-    //void onStopWaku();
-    //void onRetrieveHistory();
     
 private:
     void setupMenu();

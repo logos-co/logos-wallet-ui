@@ -3,17 +3,17 @@
     "go-wallet-sdk": {
       "flake": false,
       "locked": {
-        "lastModified": 1764778830,
-        "narHash": "sha256-dybvANL6tYFP2Fi1fqiYuxQdMouogdwgDfl8rEH2I74=",
+        "lastModified": 1764872590,
+        "narHash": "sha256-GQ5p/B+CGHho8wA2YdeZaE5n1f6VIj3gZEwo4Ep7PKY=",
         "owner": "status-im",
         "repo": "go-wallet-sdk",
-        "rev": "7f6efd25749edcef3670aeccc161fef67dada30a",
+        "rev": "7cc269bdb7c76d954de25201349bdd17975d44b6",
         "type": "github"
       },
       "original": {
         "owner": "status-im",
         "repo": "go-wallet-sdk",
-        "rev": "7f6efd25749edcef3670aeccc161fef67dada30a",
+        "rev": "7cc269bdb7c76d954de25201349bdd17975d44b6",
         "type": "github"
       }
     },
@@ -118,11 +118,11 @@
         "nixpkgs": "nixpkgs_5"
       },
       "locked": {
-        "lastModified": 1761230734,
-        "narHash": "sha256-CMRUwXH7pJZ1OI6bd/TDDDXKqQ1tQZHQEOOwK8TgYHI=",
+        "lastModified": 1764699992,
+        "narHash": "sha256-nCmK9C9F31cHvy6lWKR5WGl99aJbS3kIsROAoZ4OrwI=",
         "owner": "logos-co",
         "repo": "logos-cpp-sdk",
-        "rev": "4b143922c190df00bb3835441c9f0075cb28283b",
+        "rev": "5d0bbd0d1e00aad0532ffa7c8bf2c80f460a4f6d",
         "type": "github"
       },
       "original": {
@@ -136,11 +136,11 @@
         "nixpkgs": "nixpkgs_6"
       },
       "locked": {
-        "lastModified": 1761230734,
-        "narHash": "sha256-CMRUwXH7pJZ1OI6bd/TDDDXKqQ1tQZHQEOOwK8TgYHI=",
+        "lastModified": 1764699992,
+        "narHash": "sha256-nCmK9C9F31cHvy6lWKR5WGl99aJbS3kIsROAoZ4OrwI=",
         "owner": "logos-co",
         "repo": "logos-cpp-sdk",
-        "rev": "4b143922c190df00bb3835441c9f0075cb28283b",
+        "rev": "5d0bbd0d1e00aad0532ffa7c8bf2c80f460a4f6d",
         "type": "github"
       },
       "original": {
@@ -207,11 +207,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1761845775,
-        "narHash": "sha256-ulK8xq05ejK6qIgZ7WtWb/MJt2rk5BKfDA2z7mM3wq8=",
+        "lastModified": 1764788130,
+        "narHash": "sha256-ieu55pelIMUO/m7fLXUS3JT6sNBBHva0lNc1GRH2hb0=",
         "owner": "logos-co",
         "repo": "logos-liblogos",
-        "rev": "a92c2c1268bc70764c8f73c7bce07d21024f5af9",
+        "rev": "3046aa6ac4392a705b2890adec405d7c9d8d4178",
         "type": "github"
       },
       "original": {
@@ -232,18 +232,14 @@
         ]
       },
       "locked": {
-        "lastModified": 1764872149,
-        "narHash": "sha256-m22XD5tkmuKNpKQcUtRlk8dLFW9mGgrN2wLOo9rRUn0=",
-        "owner": "logos-co",
-        "repo": "logos-wallet-module",
-        "rev": "b7b7189294947fc89267e01b02718a76b09344db",
-        "type": "github"
+        "lastModified": 1764900113,
+        "narHash": "sha256-RIjx9xj05nGNHxskTo8x/AWWEkpTewF5FPO0ywCIIz0=",
+        "path": "/Users/dlipicar/repos/logos-wallet-module",
+        "type": "path"
       },
       "original": {
-        "owner": "logos-co",
-        "repo": "logos-wallet-module",
-        "rev": "b7b7189294947fc89267e01b02718a76b09344db",
-        "type": "github"
+        "path": "/Users/dlipicar/repos/logos-wallet-module",
+        "type": "path"
       }
     },
     "nixpkgs": {
