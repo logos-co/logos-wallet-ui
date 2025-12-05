@@ -1,5 +1,5 @@
 # Builds the logos-wallet-ui-app standalone application
-{ pkgs, common, src, logosLiblogos, logosSdk, logosWalletModule, logosCapabilityModule, logosWalletUI }:
+{ pkgs, common, src, logosLiblogos, logosSdk, logosAccountsModule, logosWalletModule, logosCapabilityModule, logosWalletUI }:
 
 pkgs.stdenv.mkDerivation rec {
   pname = "logos-wallet-ui-app";
@@ -122,6 +122,7 @@ pkgs.stdenv.mkDerivation rec {
     echo "Configuring logos-wallet-ui-app..."
     echo "liblogos: ${logosLiblogos}"
     echo "cpp-sdk: ${logosSdk}"
+    echo "accounts-module: ${logosAccountsModule}"
     echo "wallet-module: ${logosWalletModule}"
     echo "capability-module: ${logosCapabilityModule}"
     echo "wallet-ui: ${logosWalletUI}"
@@ -129,6 +130,7 @@ pkgs.stdenv.mkDerivation rec {
     # Verify that the built components exist
     test -d "${logosLiblogos}" || (echo "liblogos not found" && exit 1)
     test -d "${logosSdk}" || (echo "cpp-sdk not found" && exit 1)
+    test -d "${logosAccountsModule}" || (echo "accounts-module not found" && exit 1)
     test -d "${logosWalletModule}" || (echo "wallet-module not found" && exit 1)
     test -d "${logosCapabilityModule}" || (echo "capability-module not found" && exit 1)
     test -d "${logosWalletUI}" || (echo "wallet-ui not found" && exit 1)
@@ -199,11 +201,11 @@ pkgs.stdenv.mkDerivation rec {
     if [ -f "${logosCapabilityModule}/lib/capability_module_plugin.$OS_EXT" ]; then
       cp -L "${logosCapabilityModule}/lib/capability_module_plugin.$OS_EXT" "$out/modules/"
     fi
+    if [ -f "${logosAccountsModule}/lib/accounts_module_plugin.$OS_EXT" ]; then
+      cp -L "${logosAccountsModule}/lib/accounts_module_plugin.$OS_EXT" "$out/modules/"
+    fi
     if [ -f "${logosWalletModule}/lib/wallet_module_plugin.$OS_EXT" ]; then
       cp -L "${logosWalletModule}/lib/wallet_module_plugin.$OS_EXT" "$out/modules/"
-    fi
-    if [ -f "${logosWalletModule}/lib/libgowalletsdk.$OS_EXT" ]; then
-      cp -L "${logosWalletModule}/lib/libgowalletsdk.$OS_EXT" "$out/modules/"
     fi
     # Copy wallet_ui Qt plugin to root directory (not modules, as it's loaded differently)
     if [ -f "${logosWalletUI}/lib/wallet_ui.$OS_EXT" ]; then
@@ -216,6 +218,7 @@ Logos Wallet UI App - Build Information
 =====================================
 liblogos: ${logosLiblogos}
 cpp-sdk: ${logosSdk}
+accounts-module: ${logosAccountsModule}
 wallet-module: ${logosWalletModule}
 capability-module: ${logosCapabilityModule}
 wallet-ui: ${logosWalletUI}

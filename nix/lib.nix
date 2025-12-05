@@ -1,5 +1,5 @@
 # Builds the logos-wallet-ui library
-{ pkgs, common, src, logosWalletModule, logosSdk }:
+{ pkgs, common, src, logosAccountsModule, logosWalletModule, logosSdk }:
 
 pkgs.stdenv.mkDerivation {
   pname = "${common.pname}-lib";
@@ -16,6 +16,17 @@ pkgs.stdenv.mkDerivation {
     
     # Create generated_code directory for generated files
     mkdir -p ./generated_code
+
+    # Copy include files from logos-accounts-module result
+    echo "Copying include files from logos-accounts-module..."
+    if [ -d "${logosAccountsModule}/include" ]; then
+      echo "Found include directory in logos-accounts-module"
+      cp -r "${logosAccountsModule}/include"/* ./generated_code/
+      echo "Copied include files:"
+      ls -la ./generated_code/
+    else
+      echo "Warning: No include directory found in logos-accounts-module"
+    fi
     
     # Copy include files from logos-wallet-module result
     echo "Copying include files from logos-wallet-module..."

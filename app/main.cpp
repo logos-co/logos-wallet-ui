@@ -50,13 +50,20 @@ int main(int argc, char *argv[])
         std::cerr << "Failed to load capability_module plugin" << std::endl;
     }
     
+    // Then load accounts plugin
+    if (logos_core_load_plugin("accounts_module")) {
+        std::cout << "Successfully loaded accounts_module plugin" << std::endl;
+    } else {
+        std::cerr << "Failed to load accounts_module plugin" << std::endl;
+    }
+
     // Then load wallet plugin
     if (logos_core_load_plugin("wallet_module")) {
         std::cout << "Successfully loaded wallet_module plugin" << std::endl;
     } else {
         std::cerr << "Failed to load wallet_module plugin" << std::endl;
     }
-
+    
     // Print all loaded plugins
     char** loadedPlugins = logos_core_get_loaded_plugins();
     QStringList plugins = convertPluginsToStringList(loadedPlugins);

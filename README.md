@@ -53,7 +53,7 @@ After building the app with `nix build '.#app'`, you can run it:
 ./result/bin/logos-wallet-ui-app
 ```
 
-The app will automatically load the required modules (capability_module, wallet_module) and the wallet_ui Qt plugin. All dependencies are bundled in the Nix store layout.
+The app will automatically load the required modules (capability_module, accounts_module, wallet_module) and the wallet_ui Qt plugin. All dependencies are bundled in the Nix store layout.
 
 #### Nix Organization
 
@@ -85,8 +85,8 @@ result/
 │   └── liblogos_sdk.dylib   # Logos SDK library
 ├── modules/
 │   ├── capability_module_plugin.dylib
-│   ├── wallet_module_plugin.dylib
-│   └── libgowalletsdk.dylib
+│   ├── accounts_module_plugin.dylib
+│   └── wallet_module_plugin.dylib
 └── wallet_ui.dylib            # Qt plugin (loaded by app)
 ```
 
@@ -103,6 +103,7 @@ result/
 - Qt6 Remote Objects (qtremoteobjects)
 - logos-liblogos
 - logos-cpp-sdk (for header generation)
+- logos-accounts-module
 - logos-wallet-module
 - logos-capability-module
 - zstd

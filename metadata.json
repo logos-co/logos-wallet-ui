@@ -5,7 +5,7 @@
   "author": "Logos Core Team",
   "type": "ui",
   "main": "wallet_ui",
-  "dependencies": ["wallet_module"],
+  "dependencies": ["accounts_module", "wallet_module"],
   "category": "wallet",
   "build": {
     "type": "cmake",
@@ -21,6 +21,7 @@
   },
   "capabilities": [
     "ui_components",
-    "wallet"
+    "wallet",
+    "accounts"
   ]
 } 
