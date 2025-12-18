@@ -3,17 +3,17 @@
     "go-wallet-sdk": {
       "flake": false,
       "locked": {
-        "lastModified": 1765213122,
-        "narHash": "sha256-C3wC+3jCKz/Brz9RHw7MmVrglgsD8/gcPocWGW1rFhs=",
+        "lastModified": 1766071390,
+        "narHash": "sha256-SO2JVnvUFTTEwYOSCZ6HtJDyiDq5JWlrYUNrnef+z6E=",
         "owner": "status-im",
         "repo": "go-wallet-sdk",
-        "rev": "ec80b3239050fa23c5b440a01e7dc476fee47a2c",
+        "rev": "ef3cbceca5170c8b7dd57b058a467d76119cf3a1",
         "type": "github"
       },
       "original": {
         "owner": "status-im",
         "repo": "go-wallet-sdk",
-        "rev": "ec80b3239050fa23c5b440a01e7dc476fee47a2c",
+        "rev": "ef3cbceca5170c8b7dd57b058a467d76119cf3a1",
         "type": "github"
       }
     },
@@ -82,11 +82,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1764699992,
-        "narHash": "sha256-nCmK9C9F31cHvy6lWKR5WGl99aJbS3kIsROAoZ4OrwI=",
+        "lastModified": 1765478537,
+        "narHash": "sha256-MsYbIznSibDaZbf5tOUmw1k53PqXKM8A8ybbKTuAnjo=",
         "owner": "logos-co",
         "repo": "logos-cpp-sdk",
-        "rev": "5d0bbd0d1e00aad0532ffa7c8bf2c80f460a4f6d",
+        "rev": "8a69971bc2816992920bebde882ffe12a3eaaf30",
         "type": "github"
       },
       "original": {
@@ -232,17 +232,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1765221049,
-        "narHash": "sha256-Hz01L5gDRqNc6pK7CrxSU0MtZad99bcfg0d943u9onA=",
+        "lastModified": 1766082617,
+        "narHash": "sha256-5S1Zs8pxETDnxkwbFxsQ72WIUEtlbbM11iSTnhvkx64=",
         "owner": "logos-co",
         "repo": "logos-wallet-module",
-        "rev": "7313233e61efe7e0648ac69309f3650656d23963",
+        "rev": "1c1dc25f6d53ec6a4f7c384ffe010414d5db3023",
         "type": "github"
       },
       "original": {
         "owner": "logos-co",
         "repo": "logos-wallet-module",
-        "rev": "7313233e61efe7e0648ac69309f3650656d23963",
+        "rev": "1c1dc25f6d53ec6a4f7c384ffe010414d5db3023",
         "type": "github"
       }
     },
