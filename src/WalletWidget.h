@@ -32,6 +32,10 @@ public:
     void stopWallet();
 
 private slots:
+    void onInitEthClientButtonClicked();
+    void onRefreshEthClientsButtonClicked();
+    void onCloseEthClientButtonClicked();
+    void onEthClientSelectionChanged(int index);
     void onRpcCallButtonClicked();
     void onChainIDButtonClicked();
     void onEthBalanceButtonClicked();
@@ -60,19 +64,33 @@ private:
     // Status
     QLabel* statusLabel;
 
-    // EthClient tab UI elements
+    // EthClient tab UI elements - Management section
+    QLineEdit* ethClientRpcUrlInput;
+    QPushButton* initEthClientButton;
+    QPushButton* refreshEthClientsButton;
+    QComboBox* ethClientSelector;
+    QPushButton* closeEthClientButton;
+    
+    // EthClient tab UI elements - Operations
     QPushButton* rpcCallButton;
     QLineEdit* rpcCallMethodInput;
     QLineEdit* rpcCallParamsInput;
     QLabel* rpcCallResultLabel;
+    QTextEdit* rpcCallResultOutput;
 
     QPushButton* chainIDButton;
     QLabel* chainIDLabel;
+    QLineEdit* chainIDOutput;
 
     QLineEdit* ethBalanceAddressInput;
     QPushButton* ethBalanceButton;
     QLabel* ethBalanceAddressLabel;
+    QLineEdit* ethBalanceAddressOutput;
     QLabel* ethBalanceValueLabel;
+    QLineEdit* ethBalanceValueOutput;
+    
+    // Store list of initialized ethclients
+    QStringList initializedEthClients;
     
     // Transactions tab UI elements - TxGenerator (unified UI)
     QComboBox* txTypeComboBox;
@@ -131,14 +149,16 @@ private:
     // LogosAPI instance for remote method calls
     LogosAPI* m_logosAPI;
     LogosModules* logos;
-    
-    // Connection status
-    bool isWalletInitialized;
 
     // Helper methods
     void updateStatus(const QString& message);
-    QFrame* createSeparator();
+    QFrame* createSeparator(QWidget* parent = nullptr);
     void setupTransactionsTab();
     void updateTxParamsFields(const QString& txType);
     QString buildTxParamsJSON();
+    bool initDefaultEthClients();
+    QString getSelectedRpcUrl();
+    void refreshEthClientList();
+    void updateEthClientUIState();
+    void resetEthClientResults();
 }; 

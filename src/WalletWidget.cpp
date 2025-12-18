@@ -30,7 +30,6 @@ void WalletWidget::handleWakuMessage(const std::string& timestamp, const std::st
 
 WalletWidget::WalletWidget(QWidget* parent) 
     : QWidget(parent), 
-      isWalletInitialized(false),
       m_logosAPI(nullptr) {
     
     // Set as the active widget
@@ -65,6 +64,44 @@ WalletWidget::WalletWidget(QWidget* parent)
     ethClientTabLayout->setSpacing(10);
     ethClientTabLayout->setContentsMargins(10, 10, 10, 10);
 
+    // Create EthClient Management frame
+    QFrame* ethClientMgmtFrame = new QFrame(ethClientTab);
+    QVBoxLayout* ethClientMgmtLayout = new QVBoxLayout(ethClientMgmtFrame);
+    ethClientMgmtFrame->setLayout(ethClientMgmtLayout);
+    ethClientMgmtFrame->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+    ethClientMgmtFrame->setLineWidth(1);
+    
+    QLabel* ethClientMgmtTitle = new QLabel("<b>EthClient Management</b>", ethClientTab);
+    ethClientMgmtLayout->addWidget(ethClientMgmtTitle);
+    
+    // RPC URL input and Init button
+    QHBoxLayout* initLayout = new QHBoxLayout();
+    QLabel* rpcUrlLabel = new QLabel("RPC URL:", ethClientTab);
+    initLayout->addWidget(rpcUrlLabel);
+    ethClientRpcUrlInput = new QLineEdit(ethClientTab);
+    ethClientRpcUrlInput->setPlaceholderText("https://...");
+    initLayout->addWidget(ethClientRpcUrlInput, 1);
+    initEthClientButton = new QPushButton("Init EthClient", ethClientTab);
+    initLayout->addWidget(initEthClientButton);
+    ethClientMgmtLayout->addLayout(initLayout);
+    
+    // Refresh and Selector
+    QHBoxLayout* selectorLayout = new QHBoxLayout();
+    refreshEthClientsButton = new QPushButton("Refresh List", ethClientTab);
+    selectorLayout->addWidget(refreshEthClientsButton);
+    QLabel* selectorLabel = new QLabel("Selected EthClient:", ethClientTab);
+    selectorLayout->addWidget(selectorLabel);
+    ethClientSelector = new QComboBox(ethClientTab);
+    ethClientSelector->setEditable(false);
+    ethClientSelector->addItem("-- No EthClient Selected --", "");
+    selectorLayout->addWidget(ethClientSelector, 1);
+    closeEthClientButton = new QPushButton("Close Selected", ethClientTab);
+    selectorLayout->addWidget(closeEthClientButton);
+    ethClientMgmtLayout->addLayout(selectorLayout);
+    
+    ethClientTabLayout->addWidget(ethClientMgmtFrame);
+    ethClientTabLayout->addWidget(createSeparator(ethClientTab));
+
     // Create RPC Call frame
     QFrame* rpcCallFrame = new QFrame(ethClientTab);
     QVBoxLayout* rpcCallLayout = new QVBoxLayout(rpcCallFrame);
@@ -83,15 +120,19 @@ WalletWidget::WalletWidget(QWidget* parent)
     rpcCallParamsInput = new QLineEdit(ethClientTab);
     rpcCallParamsInput->setPlaceholderText("Enter RPC Call Params...");
 
-    // Create RPC Call result label
-    rpcCallResultLabel = new QLabel("RPC Call Result: Not initialized", ethClientTab);
-    rpcCallResultLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    // Create RPC Call result label and output
+    rpcCallResultLabel = new QLabel("RPC Call Result:", ethClientTab);
+    rpcCallResultOutput = new QTextEdit(ethClientTab);
+    rpcCallResultOutput->setReadOnly(true);
+    rpcCallResultOutput->setPlaceholderText("RPC call result will appear here...");
+    rpcCallResultOutput->setMaximumHeight(100);
 
     // Add RPC Call components to layout
     rpcCallLayout->addWidget(rpcCallButton);
     rpcCallLayout->addWidget(rpcCallMethodInput);
     rpcCallLayout->addWidget(rpcCallParamsInput);
     rpcCallLayout->addWidget(rpcCallResultLabel);
+    rpcCallLayout->addWidget(rpcCallResultOutput);
 
     // Create Chain ID frame
     QFrame* chainIDFrame = new QFrame(ethClientTab);
@@ -103,12 +144,16 @@ WalletWidget::WalletWidget(QWidget* parent)
     // Create Chain ID button
     chainIDButton = new QPushButton("Get Chain ID", ethClientTab);
     
-    // Create Chain ID label
-    chainIDLabel = new QLabel("Chain ID: Not initialized", ethClientTab);
+    // Create Chain ID label and output
+    chainIDLabel = new QLabel("Chain ID:", ethClientTab);
+    chainIDOutput = new QLineEdit(ethClientTab);
+    chainIDOutput->setReadOnly(true);
+    chainIDOutput->setPlaceholderText("Chain ID will appear here...");
 
     // Add Chain ID components to layout
     chainIDLayout->addWidget(chainIDButton);
     chainIDLayout->addWidget(chainIDLabel);
+    chainIDLayout->addWidget(chainIDOutput);
 
     // Create ETH Balance frame
     QFrame* ethBalanceFrame = new QFrame(ethClientTab);
@@ -124,19 +169,24 @@ WalletWidget::WalletWidget(QWidget* parent)
     ethBalanceAddressInput = new QLineEdit(ethClientTab);
     ethBalanceAddressInput->setPlaceholderText("Enter ETH Balance Address...");
 
-    // Create ETH Balance label
-    ethBalanceAddressLabel = new QLabel("ETH Balance Address: Not initialized", ethClientTab);
-    ethBalanceAddressLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    // Create ETH Balance labels and outputs
+    ethBalanceAddressLabel = new QLabel("ETH Balance Address:", ethClientTab);
+    ethBalanceAddressOutput = new QLineEdit(ethClientTab);
+    ethBalanceAddressOutput->setReadOnly(true);
+    ethBalanceAddressOutput->setPlaceholderText("Address will appear here...");
 
-    // Create ETH Balance value label
-    ethBalanceValueLabel = new QLabel("ETH Balance Value: Not initialized", ethClientTab);
-    ethBalanceValueLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    ethBalanceValueLabel = new QLabel("ETH Balance:", ethClientTab);
+    ethBalanceValueOutput = new QLineEdit(ethClientTab);
+    ethBalanceValueOutput->setReadOnly(true);
+    ethBalanceValueOutput->setPlaceholderText("Balance will appear here...");
 
     // Add ETH Balance components to layout
     ethBalanceLayout->addWidget(ethBalanceAddressInput);
     ethBalanceLayout->addWidget(ethBalanceButton);
     ethBalanceLayout->addWidget(ethBalanceAddressLabel);
+    ethBalanceLayout->addWidget(ethBalanceAddressOutput);
     ethBalanceLayout->addWidget(ethBalanceValueLabel);
+    ethBalanceLayout->addWidget(ethBalanceValueOutput);
 
     // Add all EthClient components to tab layout
     ethClientTabLayout->addWidget(rpcCallFrame);
@@ -178,13 +228,16 @@ WalletWidget::WalletWidget(QWidget* parent)
     mainLayout->setContentsMargins(20, 20, 20, 20);
     
     // Connect signals to slots
+    connect(initEthClientButton, &QPushButton::clicked, this, &WalletWidget::onInitEthClientButtonClicked);
+    connect(refreshEthClientsButton, &QPushButton::clicked, this, &WalletWidget::onRefreshEthClientsButtonClicked);
+    connect(closeEthClientButton, &QPushButton::clicked, this, &WalletWidget::onCloseEthClientButtonClicked);
+    connect(ethClientSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &WalletWidget::onEthClientSelectionChanged);
     connect(rpcCallButton, &QPushButton::clicked, this, &WalletWidget::onRpcCallButtonClicked);
     connect(chainIDButton, &QPushButton::clicked, this, &WalletWidget::onChainIDButtonClicked);
     connect(ethBalanceButton, &QPushButton::clicked, this, &WalletWidget::onEthBalanceButtonClicked);
 
-    // Disable UI components until Wallet is initialized
-    chainIDButton->setEnabled(false);
-    ethBalanceButton->setEnabled(false);
+    // Initially disable all ethclient operation UI components (no ethclient selected)
+    updateEthClientUIState();
 
     // Auto-initialize Wallet
     initWallet();
@@ -203,51 +256,218 @@ void WalletWidget::initWallet()
 {
     updateStatus("Status: Initializing Wallet...");
 
-    bool success = logos->wallet_module.initWallet("");
+    // Initialize some default ethClients
+    bool success = initDefaultEthClients();
 
     if (!success) {
         updateStatus("Error: Failed to initialize Wallet");
         return;
     }
 
-    isWalletInitialized = true;
     updateStatus("Status: Wallet initialized");
 
-    // Enable UI components
-    chainIDButton->setEnabled(true);
-    ethBalanceButton->setEnabled(true);
 }
+
+bool WalletWidget::initDefaultEthClients() {
+    bool success = logos->wallet_module.ethClientInit("https://ethereum-rpc.publicnode.com");
+    success &= logos->wallet_module.ethClientInit("https://arbitrum-one-rpc.publicnode.com");
+    success &= logos->wallet_module.ethClientInit("https://optimism-rpc.publicnode.com");
+    success &= logos->wallet_module.ethClientInit("https://ethereum-sepolia-rpc.publicnode.com");
+    success &= logos->wallet_module.ethClientInit("https://arbitrum-sepolia-rpc.publicnode.com");
+    success &= logos->wallet_module.ethClientInit("https://optimism-sepolia-rpc.publicnode.com");
+    success &= logos->wallet_module.ethClientInit("https://public.sepolia.rpc.status.network");
+    if (!success) {
+        updateStatus("Error: Failed to initialize default EthClients");
+        return false;
+    }
+    refreshEthClientList();
+    updateEthClientUIState();
+    return true;
+}
+
 
 void WalletWidget::stopWallet() {
     // Nothing to do here as the plugin handles the cleanup internally
     updateStatus("Status: Stopping Wallet...");
-    isWalletInitialized = false;
     updateStatus("Status: Wallet stopped");
     
     // Disable UI components
-    chainIDButton->setEnabled(false);
-    ethBalanceButton->setEnabled(false);
+    updateEthClientUIState();
+}
+
+QString WalletWidget::getSelectedRpcUrl() {
+    int index = ethClientSelector->currentIndex();
+    if (index > 0) {
+        return ethClientSelector->itemData(index).toString();
+    }
+    return "";
+}
+
+void WalletWidget::refreshEthClientList() {
+    // Get the list of initialized ethclients from the module
+    QStringList clients = logos->wallet_module.ethClientGetClients();
+    
+    // Update our local list
+    initializedEthClients = clients;
+    
+    // Store current selection
+    QString currentSelection = getSelectedRpcUrl();
+
+    // Update the dropdown
+    ethClientSelector->clear();
+    ethClientSelector->addItem("-- No EthClient Selected --", "");
+    
+    for (const QString& rpcUrl : initializedEthClients) {
+        ethClientSelector->addItem(rpcUrl, rpcUrl);
+    }
+    
+    // Restore selection if it still exists
+    if (!currentSelection.isEmpty()) {
+        int index = ethClientSelector->findData(currentSelection);
+        if (index >= 0) {
+            ethClientSelector->setCurrentIndex(index);
+        } else {
+            // Selection was removed, reset to no selection
+            ethClientSelector->setCurrentIndex(0);
+        }
+    } else {
+        // No previous selection, ensure index 0
+        ethClientSelector->setCurrentIndex(0);
+    }
+    
+    // Explicitly update UI state after restoring selection
+    updateEthClientUIState();
+}
+
+void WalletWidget::onEthClientSelectionChanged(int index) {
+    // Reset results when selection changes
+    resetEthClientResults();
+    
+    // Update UI state based on selection
+    updateEthClientUIState();
+}
+
+void WalletWidget::updateEthClientUIState() {
+    int currentIndex = ethClientSelector->currentIndex();
+    bool hasSelection = (currentIndex > 0);
+    
+    // Enable/disable operation buttons and inputs
+    rpcCallButton->setEnabled(hasSelection);
+    rpcCallMethodInput->setEnabled(hasSelection);
+    rpcCallParamsInput->setEnabled(hasSelection);
+    
+    chainIDButton->setEnabled(hasSelection);
+    
+    ethBalanceButton->setEnabled(hasSelection);
+    ethBalanceAddressInput->setEnabled(hasSelection);
+    
+    closeEthClientButton->setEnabled(hasSelection);
+    
+    // Result outputs are always enabled (read-only) so users can copy results
+    // even after changing selection, but we could disable them if desired
+}
+
+void WalletWidget::resetEthClientResults() {
+    // Reset all result outputs to empty/default state
+    rpcCallResultOutput->clear();
+    chainIDOutput->clear();
+    ethBalanceAddressOutput->clear();
+    ethBalanceValueOutput->clear();
+}
+
+void WalletWidget::onInitEthClientButtonClicked() {
+    QString rpcUrl = ethClientRpcUrlInput->text().trimmed();
+    if (rpcUrl.isEmpty()) {
+        QMessageBox::warning(this, "Error", "Please enter an RPC URL");
+        return;
+    }
+    
+    updateStatus("Initializing EthClient...");
+    
+    // Initialize ethclient using ethClientInit
+    bool success = logos->wallet_module.ethClientInit(rpcUrl);
+    
+    if (success) {
+        refreshEthClientList();
+        // Select the newly initialized ethclient
+        int index = ethClientSelector->findData(rpcUrl);
+        if (index >= 0) {
+            ethClientSelector->setCurrentIndex(index);
+            // updateEthClientUIState will be called by onEthClientSelectionChanged
+        }
+        ethClientRpcUrlInput->clear();
+        updateStatus("EthClient initialized: " + rpcUrl);
+        QMessageBox::information(this, "Success", "EthClient initialized successfully");
+    } else {
+        updateStatus("Failed to initialize EthClient");
+        QMessageBox::warning(this, "Error", "Failed to initialize EthClient. Please check the RPC URL.");
+    }
+}
+
+void WalletWidget::onRefreshEthClientsButtonClicked() {
+    refreshEthClientList();
+    updateStatus("EthClient list refreshed");
+}
+
+void WalletWidget::onCloseEthClientButtonClicked() {
+    QString rpcUrl = getSelectedRpcUrl();
+    if (rpcUrl.isEmpty()) {
+        QMessageBox::warning(this, "Error", "Please select an EthClient to close");
+        return;
+    }
+    
+    updateStatus("Closing EthClient...");
+    
+    // Close ethclient using ethClientClose
+    bool success = logos->wallet_module.ethClientClose(rpcUrl);
+    
+    if (success) {
+        refreshEthClientList();
+        // Selection will be reset to index 0 if the closed client was selected
+        // updateEthClientUIState will be called by onEthClientSelectionChanged
+        updateStatus("EthClient closed: " + rpcUrl);
+        QMessageBox::information(this, "Success", "EthClient closed");
+    } else {
+        updateStatus("Failed to close EthClient");
+        QMessageBox::warning(this, "Error", "Failed to close EthClient");
+    }
 }
 
 void WalletWidget::onRpcCallButtonClicked() {
-    rpcCallResultLabel->setText("RPC Call Result: Calling...");
+    QString rpcUrl = getSelectedRpcUrl();
+    if (rpcUrl.isEmpty()) {
+        return; // Should not happen as button is disabled, but check anyway
+    }
+    
+    rpcCallResultOutput->setPlainText("Calling...");
     QString method = rpcCallMethodInput->text();
     QString paramsString = rpcCallParamsInput->text();
-    QString result = logos->wallet_module.rpcCall("", method, paramsString);
-    rpcCallResultLabel->setText("RPC Call Result: " + result);
+    QString result = logos->wallet_module.ethClientRpcCall(rpcUrl, method, paramsString);
+    rpcCallResultOutput->setPlainText(result);
 }
 
 void WalletWidget::onChainIDButtonClicked() {
-    chainIDLabel->setText("Getting Chain ID...");
-    QString chainID = logos->wallet_module.chainId("");
-    chainIDLabel->setText("Chain ID: " + chainID);
+    QString rpcUrl = getSelectedRpcUrl();
+    if (rpcUrl.isEmpty()) {
+        return; // Should not happen as button is disabled, but check anyway
+    }
+    
+    chainIDOutput->setText("Getting Chain ID...");
+    QString chainID = logos->wallet_module.ethClientChainId(rpcUrl);
+    chainIDOutput->setText(chainID);
 }
 
 void WalletWidget::onEthBalanceButtonClicked() {
-    ethBalanceAddressLabel->setText("ETH Balance Address: " + ethBalanceAddressInput->text());
-    ethBalanceValueLabel->setText("Getting ETH Balance...");
-    QString ethBalance = logos->wallet_module.getEthBalance("", ethBalanceAddressInput->text());
-    ethBalanceValueLabel->setText("ETH Balance: " + ethBalance);
+    QString rpcUrl = getSelectedRpcUrl();
+    if (rpcUrl.isEmpty()) {
+        return; // Should not happen as button is disabled, but check anyway
+    }
+    
+    QString address = ethBalanceAddressInput->text();
+    ethBalanceAddressOutput->setText(address);
+    ethBalanceValueOutput->setText("Getting ETH Balance...");
+    QString ethBalance = logos->wallet_module.ethClientGetBalance(rpcUrl, address);
+    ethBalanceValueOutput->setText(ethBalance);
 }
 
 // Transaction generator handlers
@@ -574,8 +794,11 @@ void WalletWidget::setupTransactionsTab() {
     connect(txGetHashButton, &QPushButton::clicked, this, &WalletWidget::onTransactionGetHashButtonClicked);
 }
 
-QFrame* WalletWidget::createSeparator() {
-    QFrame* separator = new QFrame(transactionsScrollContent);
+QFrame* WalletWidget::createSeparator(QWidget* parent) {
+    if (parent == nullptr) {
+        parent = transactionsScrollContent;
+    }
+    QFrame* separator = new QFrame(parent);
     separator->setFrameShape(QFrame::HLine);
     separator->setFrameShadow(QFrame::Sunken);
     separator->setMaximumHeight(2);
