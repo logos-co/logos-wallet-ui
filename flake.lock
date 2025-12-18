@@ -3,17 +3,17 @@
     "go-wallet-sdk": {
       "flake": false,
       "locked": {
-        "lastModified": 1766071390,
-        "narHash": "sha256-SO2JVnvUFTTEwYOSCZ6HtJDyiDq5JWlrYUNrnef+z6E=",
+        "lastModified": 1767895376,
+        "narHash": "sha256-XUWdi2m9bOhHlwk8KTr/mVkwtRxutiQVX7en0QxbVJw=",
         "owner": "status-im",
         "repo": "go-wallet-sdk",
-        "rev": "ef3cbceca5170c8b7dd57b058a467d76119cf3a1",
+        "rev": "f6c0924394c5bdf361bd16b739a80432e68291f5",
         "type": "github"
       },
       "original": {
         "owner": "status-im",
         "repo": "go-wallet-sdk",
-        "rev": "ef3cbceca5170c8b7dd57b058a467d76119cf3a1",
+        "rev": "f6c0924394c5bdf361bd16b739a80432e68291f5",
         "type": "github"
       }
     },
@@ -232,17 +232,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1766082617,
-        "narHash": "sha256-5S1Zs8pxETDnxkwbFxsQ72WIUEtlbbM11iSTnhvkx64=",
+        "lastModified": 1767896335,
+        "narHash": "sha256-E8lQekJiyXyHVPGJdbBEkG2vqJGqEcyDsDDUKdRGe/Q=",
         "owner": "logos-co",
         "repo": "logos-wallet-module",
-        "rev": "1c1dc25f6d53ec6a4f7c384ffe010414d5db3023",
+        "rev": "ef98e6ec6db9cffc819dacb45667035294af04b2",
         "type": "github"
       },
       "original": {
         "owner": "logos-co",
         "repo": "logos-wallet-module",
-        "rev": "1c1dc25f6d53ec6a4f7c384ffe010414d5db3023",
+        "rev": "ef98e6ec6db9cffc819dacb45667035294af04b2",
         "type": "github"
       }
     },
