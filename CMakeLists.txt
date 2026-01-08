@@ -92,6 +92,10 @@ set(SOURCES
     WalletUIComponent.h
     src/WalletWidget.cpp
     src/WalletWidget.h
+    src/EthClientTab.cpp
+    src/EthClientTab.h
+    src/TransactionsTab.cpp
+    src/TransactionsTab.h
     src/WalletWindow.cpp
     src/WalletWindow.h
     src/main.cpp
