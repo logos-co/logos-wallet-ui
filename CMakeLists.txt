@@ -68,7 +68,7 @@ if(NOT _cpp_sdk_found)
 endif()
 
 # Find Qt packages
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets RemoteObjects)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets RemoteObjects Quick QuickWidgets)
 
 # Get the real path to handle symlinks correctly
 get_filename_component(REAL_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" REALPATH)
@@ -90,15 +90,9 @@ endif()
 set(SOURCES
     WalletUIComponent.cpp
     WalletUIComponent.h
-    src/WalletWidget.cpp
-    src/WalletWidget.h
-    src/EthClientTab.cpp
-    src/EthClientTab.h
-    src/TransactionsTab.cpp
-    src/TransactionsTab.h
-    src/WalletWindow.cpp
-    src/WalletWindow.h
-    src/main.cpp
+    src/WalletBackend.cpp
+    src/WalletBackend.h
+    src/wallet_resources.qrc
 )
 
 # Add SDK sources (only if source layout, installed layout uses the library)
@@ -208,10 +202,12 @@ else()
 endif()
 
 # Link against libraries
-target_link_libraries(wallet_ui PRIVATE 
+target_link_libraries(wallet_ui PRIVATE
     Qt6::Core
     Qt6::Widgets
     Qt6::RemoteObjects
+    Qt6::Quick
+    Qt6::QuickWidgets
     component-interfaces
 )
 
