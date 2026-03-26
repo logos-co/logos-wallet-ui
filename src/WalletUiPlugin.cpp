@@ -1,12 +1,12 @@
-#include "WalletUIComponent.h"
-#include "src/WalletBackend.h"
-
+#include "WalletUiPlugin.h"
+#include "WalletBackend.h"
 #include <QQuickWidget>
 #include <QQmlContext>
-#include <QFileInfo>
+#include <QQmlEngine>
 #include <QFile>
+#include <QFileInfo>
 
-QWidget* WalletUIComponent::createWidget(LogosAPI* logosAPI) {
+QWidget* WalletUiPlugin::createWidget(LogosAPI* logosAPI) {
     QQuickWidget* quickWidget = new QQuickWidget();
     quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
 
@@ -15,16 +15,18 @@ QWidget* WalletUIComponent::createWidget(LogosAPI* logosAPI) {
     WalletBackend* backend = new WalletBackend(logosAPI, quickWidget);
     quickWidget->rootContext()->setContextProperty("backend", backend);
 
+    // Allow QML hot reload via environment variable
     QString qmlPath = "qrc:/WalletView.qml";
     QString envPath = qgetenv("WALLET_UI_QML_PATH");
     if (!envPath.isEmpty() && QFile::exists(envPath)) {
         qmlPath = QUrl::fromLocalFile(QFileInfo(envPath).absoluteFilePath()).toString();
     }
+
     quickWidget->setSource(QUrl(qmlPath));
 
     return quickWidget;
 }
 
-void WalletUIComponent::destroyWidget(QWidget* widget) {
+void WalletUiPlugin::destroyWidget(QWidget* widget) {
     delete widget;
 }
