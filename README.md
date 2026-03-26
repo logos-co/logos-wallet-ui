@@ -1,110 +1,47 @@
 # logos-wallet-ui
 
+Wallet interface for the Logos application — a Qt UI plugin built with [logos-module-builder](https://github.com/logos-co/logos-module-builder).
+
 ## How to Build
 
 ### Using Nix (Recommended)
 
-#### Build Complete UI Plugin
-
 ```bash
-# Build everything (default)
+# Build the plugin (default)
 nix build
 
-# Or explicitly
-nix build '.#default'
-```
-
-The result will include:
-- `/lib/wallet_ui.dylib` (or `.so` on Linux) - The Wallet UI plugin
-
-#### Build Individual Components
-
-```bash
-# Build only the library (plugin)
+# Build only the library
 nix build '.#lib'
 
-# Build the standalone Qt application
-nix build '.#app'
+# Run in logos-standalone-app
+nix run .
 ```
 
-#### Development Shell
+### Development Shell
 
 ```bash
-# Enter development shell with all dependencies
 nix develop
 ```
 
-**Note:** In zsh, you need to quote the target (e.g., `'.#default'`) to prevent glob expansion.
-
-If you don't have flakes enabled globally, add experimental flags:
-
-```bash
-nix build --extra-experimental-features 'nix-command flakes'
-```
-
-The compiled artifacts can be found at `result/`
-
-#### Running the Standalone App
-
-After building the app with `nix build '.#app'`, you can run it:
-
-```bash
-# Run the standalone Qt application
-./result/bin/logos-wallet-ui-app
-```
-
-The app will automatically load the required modules (capability_module, wallet_module) and the wallet_ui Qt plugin. All dependencies are bundled in the Nix store layout.
-
-#### Nix Organization
-
-The nix build system is organized into modular files in the `/nix` directory:
-- `nix/default.nix` - Common configuration (dependencies, flags, metadata)
-- `nix/lib.nix` - UI plugin compilation
-- `nix/app.nix` - Standalone Qt application compilation
+**Note:** In zsh, quote the target (e.g., `'.#lib'`).
 
 ## Output Structure
 
-When built with Nix:
-
-**Library build (`nix build '.#logos-wallet-ui-lib'`):**
+**Library build (`nix build`):**
 ```
 result/
 └── lib/
-    └── wallet_ui.dylib    # Logos Wallet UI plugin
-```
-
-**App build (`nix build '.#app'`):**
-```
-result/
-├── bin/
-│   ├── logos-wallet-ui-app    # Standalone Qt application
-│   ├── logos_host           # Logos host executable (for plugins)
-│   └── logoscore            # Logos core executable
-├── lib/
-│   ├── liblogos_core.dylib  # Logos core library
-│   └── liblogos_sdk.dylib   # Logos SDK library
-├── modules/
-│   ├── capability_module_plugin.dylib
-│   ├── wallet_module_plugin.dylib
-│   └── libgowalletsdk.dylib
-└── wallet_ui.dylib            # Qt plugin (loaded by app)
+    └── wallet_ui_plugin.so    # Logos Wallet UI plugin (.dylib on macOS)
 ```
 
 ## Requirements
 
-### Build Tools
-- CMake (3.16 or later)
-- Ninja build system
-- pkg-config
+- [Nix](https://nixos.org/) with flakes enabled
+- All other dependencies are managed by `logos-module-builder`
 
-### Dependencies
-- Qt6 (qtbase)
-- Qt6 Widgets (included in qtbase)
-- Qt6 Remote Objects (qtremoteobjects)
-- logos-liblogos
-- logos-cpp-sdk (for header generation)
+## Dependencies
+
+- Qt6 (Core, Widgets, RemoteObjects, Quick, QuickWidgets)
+- logos-cpp-sdk
 - logos-wallet-module
-- logos-capability-module
-- zstd
-- krb5
-- abseil-cpp
+- zstd, krb5, abseil-cpp
