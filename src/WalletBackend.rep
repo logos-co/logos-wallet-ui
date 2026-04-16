@@ -1,0 +1,21 @@
+class WalletBackend
+{
+    ENUM WalletStatus { NotInitialized=0, Initializing=1, Ready=2, Error=3 }
+
+    PROP(WalletStatus status READONLY)
+    PROP(QStringList clients READONLY)
+    PROP(int selectedClientIndex READWRITE)
+    PROP(QString statusMessage READONLY)
+
+    SLOT(void initEthClient(QString url))
+    SLOT(void closeEthClient(QString url))
+    SLOT(void refreshClients())
+    SLOT(void initializeDefaultClients())
+    SLOT(QString rpcCall(QString url, QString method, QString params))
+    SLOT(QString getChainId(QString url))
+    SLOT(QString getBalance(QString url, QString address))
+    SLOT(QString generateTransaction(QString txType, QString paramsJSON))
+    SLOT(QString jsonToRlp(QString json))
+    SLOT(QString rlpToJson(QString rlp))
+    SLOT(QString getHash(QString json))
+}

@@ -2,15 +2,14 @@
 #include <QDebug>
 
 WalletBackend::WalletBackend(LogosAPI* logosAPI, QObject* parent)
-    : QObject(parent),
-      m_logosAPI(nullptr),
-      m_logos(nullptr),
-      m_status(NotInitialized),
-      m_selectedClientIndex(-1)
+    : WalletBackendSimpleSource(parent),
+      m_logosAPI(logosAPI),
+      m_logos(nullptr)
 {
-    if (logosAPI) {
-        m_logosAPI = logosAPI;
-    } else {
+    setStatus(NotInitialized);
+    setSelectedClientIndex(-1);
+
+    if (!m_logosAPI) {
         m_logosAPI = new LogosAPI("core", this);
     }
     m_logos = new LogosModules(m_logosAPI);
@@ -18,31 +17,14 @@ WalletBackend::WalletBackend(LogosAPI* logosAPI, QObject* parent)
     initializeDefaultClients();
 }
 
-void WalletBackend::setStatus(WalletStatus status) {
-    if (m_status != status) {
-        m_status = status;
-        emit statusChanged();
-    }
-}
-
-void WalletBackend::setStatusMessage(const QString& message) {
-    if (m_statusMessage != message) {
-        m_statusMessage = message;
-        emit statusMessageChanged();
-        qDebug() << message;
-    }
-}
-
-void WalletBackend::setSelectedClientIndex(int index) {
-    if (m_selectedClientIndex != index) {
-        m_selectedClientIndex = index;
-        emit selectedClientIndexChanged();
-    }
+void WalletBackend::setStatusMessageAndLog(const QString& message) {
+    qDebug() << message;
+    setStatusMessage(message);
 }
 
 void WalletBackend::initializeDefaultClients() {
     setStatus(Initializing);
-    setStatusMessage("Initializing default EthClients...");
+    setStatusMessageAndLog("Initializing default EthClients...");
 
     bool success = m_logos->wallet_module.ethClientInit("https://ethereum-rpc.publicnode.com");
     success &= m_logos->wallet_module.ethClientInit("https://arbitrum-one-rpc.publicnode.com");
@@ -54,83 +36,82 @@ void WalletBackend::initializeDefaultClients() {
 
     if (!success) {
         setStatus(Error);
-        setStatusMessage("Error: Failed to initialize default EthClients");
+        setStatusMessageAndLog("Error: Failed to initialize default EthClients");
         return;
     }
 
     refreshClients();
     setStatus(Ready);
-    setStatusMessage("Default EthClients initialized");
+    setStatusMessageAndLog("Default EthClients initialized");
 }
 
 void WalletBackend::refreshClients() {
-    QStringList clients = m_logos->wallet_module.ethClientGetClients();
-    if (m_clients != clients) {
-        m_clients = clients;
-        emit clientsChanged();
+    QStringList list = m_logos->wallet_module.ethClientGetClients();
+    if (clients() != list) {
+        setClients(list);
     }
-    setStatusMessage("EthClient list refreshed");
+    setStatusMessageAndLog("EthClient list refreshed");
 }
 
-void WalletBackend::initEthClient(const QString& url) {
+void WalletBackend::initEthClient(QString url) {
     if (url.trimmed().isEmpty()) {
-        setStatusMessage("Error: Please enter an RPC URL");
+        setStatusMessageAndLog("Error: Please enter an RPC URL");
         return;
     }
 
-    if (m_clients.contains(url.trimmed())) {
-        setStatusMessage("EthClient already initialized: " + url.trimmed());
+    if (clients().contains(url.trimmed())) {
+        setStatusMessageAndLog("EthClient already initialized: " + url.trimmed());
         return;
     }
 
-    setStatusMessage("Initializing EthClient...");
+    setStatusMessageAndLog("Initializing EthClient...");
     bool success = m_logos->wallet_module.ethClientInit(url.trimmed());
 
     if (success) {
         refreshClients();
         // Select the newly initialized client
-        int index = m_clients.indexOf(url.trimmed());
+        int index = clients().indexOf(url.trimmed());
         if (index >= 0) {
             setSelectedClientIndex(index);
         }
-        setStatusMessage("EthClient initialized: " + url.trimmed());
+        setStatusMessageAndLog("EthClient initialized: " + url.trimmed());
     } else {
-        setStatusMessage("Failed to initialize EthClient");
+        setStatusMessageAndLog("Failed to initialize EthClient");
     }
 }
 
-void WalletBackend::closeEthClient(const QString& url) {
+void WalletBackend::closeEthClient(QString url) {
     if (url.isEmpty()) {
-        setStatusMessage("Error: No EthClient selected");
+        setStatusMessageAndLog("Error: No EthClient selected");
         return;
     }
 
-    setStatusMessage("Closing EthClient...");
+    setStatusMessageAndLog("Closing EthClient...");
     bool success = m_logos->wallet_module.ethClientClose(url);
 
     if (success) {
         refreshClients();
         setSelectedClientIndex(-1);
-        setStatusMessage("EthClient closed: " + url);
+        setStatusMessageAndLog("EthClient closed: " + url);
     } else {
-        setStatusMessage("Failed to close EthClient");
+        setStatusMessageAndLog("Failed to close EthClient");
     }
 }
 
-QString WalletBackend::rpcCall(const QString& url, const QString& method, const QString& params) {
+QString WalletBackend::rpcCall(QString url, QString method, QString params) {
     return m_logos->wallet_module.ethClientRpcCall(url, method, params);
 }
 
-QString WalletBackend::getChainId(const QString& url) {
+QString WalletBackend::getChainId(QString url) {
     return m_logos->wallet_module.ethClientChainId(url);
 }
 
-QString WalletBackend::getBalance(const QString& url, const QString& address) {
+QString WalletBackend::getBalance(QString url, QString address) {
     return m_logos->wallet_module.ethClientGetBalance(url, address);
 }
 
-QString WalletBackend::generateTransaction(const QString& txType, const QString& paramsJSON) {
-    setStatusMessage("Generating transaction...");
+QString WalletBackend::generateTransaction(QString txType, QString paramsJSON) {
+    setStatusMessageAndLog("Generating transaction...");
     QString result;
 
     if (txType == "transferETH") {
@@ -154,31 +135,31 @@ QString WalletBackend::generateTransaction(const QString& txType, const QString&
     } else if (txType == "setApprovalForAllERC1155") {
         result = m_logos->wallet_module.txGeneratorSetApprovalForAllERC1155(paramsJSON);
     } else {
-        setStatusMessage("Error: Unknown transaction type: " + txType);
+        setStatusMessageAndLog("Error: Unknown transaction type: " + txType);
         return "";
     }
 
-    setStatusMessage("Transaction generated");
+    setStatusMessageAndLog("Transaction generated");
     return result;
 }
 
-QString WalletBackend::jsonToRlp(const QString& json) {
-    setStatusMessage("Converting JSON to RLP...");
+QString WalletBackend::jsonToRlp(QString json) {
+    setStatusMessageAndLog("Converting JSON to RLP...");
     QString result = m_logos->wallet_module.transactionJsonToRlp(json);
-    setStatusMessage("JSON converted to RLP");
+    setStatusMessageAndLog("JSON converted to RLP");
     return result;
 }
 
-QString WalletBackend::rlpToJson(const QString& rlp) {
-    setStatusMessage("Converting RLP to JSON...");
+QString WalletBackend::rlpToJson(QString rlp) {
+    setStatusMessageAndLog("Converting RLP to JSON...");
     QString result = m_logos->wallet_module.transactionRlpToJson(rlp);
-    setStatusMessage("RLP converted to JSON");
+    setStatusMessageAndLog("RLP converted to JSON");
     return result;
 }
 
-QString WalletBackend::getHash(const QString& json) {
-    setStatusMessage("Getting transaction hash...");
+QString WalletBackend::getHash(QString json) {
+    setStatusMessageAndLog("Getting transaction hash...");
     QString result = m_logos->wallet_module.transactionGetHash(json);
-    setStatusMessage("Transaction hash retrieved");
+    setStatusMessageAndLog("Transaction hash retrieved");
     return result;
 }

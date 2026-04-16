@@ -1,11 +1,29 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
-import WalletBackend 1.0
+
+// WalletStatus enum (NotInitialized/Initializing/Ready/Error) declared in
+// WalletBackend.rep — registered with QML by the replica factory plugin.
+import Logos.WalletBackend 1.0
 
 Rectangle {
     id: root
     color: _d.bgColor
+
+    readonly property var backend: logos.module("wallet_ui")
+    property bool ready: false
+
+    Connections {
+        target: logos
+        function onViewModuleReadyChanged(moduleName, isReady) {
+            if (moduleName === "wallet_ui")
+                root.ready = isReady && root.backend !== null
+        }
+    }
+
+    Component.onCompleted: {
+        root.ready = root.backend !== null && logos.isViewModuleReady("wallet_ui")
+    }
 
     QtObject {
         id: _d
@@ -169,7 +187,7 @@ Rectangle {
         }
     }
 
-    // --- Reusable inline components (matching accounts-ui pattern) ---
+    // --- Reusable inline components ---
 
     component SectionHeader: Text {
         Layout.fillWidth: true
@@ -287,12 +305,26 @@ Rectangle {
         color: _d.separatorColor
     }
 
-    // --- Main layout ---
+    // --- Loading state ---
+    ColumnLayout {
+        anchors.centerIn: parent
+        visible: !root.ready
+        spacing: 12
+        Text {
+            Layout.alignment: Qt.AlignHCenter
+            text: "Connecting to wallet backend..."
+            color: _d.labelColor
+            font.pixelSize: _d.textSize
+        }
+        BusyIndicator { Layout.alignment: Qt.AlignHCenter; running: !root.ready }
+    }
 
+    // --- Main layout ---
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 16
         spacing: 12
+        visible: root.ready
 
         // Status bar
         Rectangle {
@@ -313,14 +345,14 @@ Rectangle {
                     font.pixelSize: _d.textSize
                 }
                 Text {
-                    text: _d.getStatusString(backend.status)
-                    color: _d.getStatusColor(backend.status)
+                    text: root.backend ? _d.getStatusString(root.backend.status) : "N/A"
+                    color: root.backend ? _d.getStatusColor(root.backend.status) : _d.labelColor
                     font.pixelSize: _d.textSize
                     font.bold: true
                 }
                 Item { Layout.fillWidth: true }
                 Text {
-                    text: backend.statusMessage
+                    text: root.backend ? root.backend.statusMessage : ""
                     color: _d.labelColor
                     font.pixelSize: _d.textSize
                     elide: Text.ElideRight
@@ -383,7 +415,6 @@ Rectangle {
                     width: ethClientScrollView.availableWidth
                     spacing: 12
 
-                    // Management Section
                     SectionHeader { text: "EthClient Management" }
 
                     RowLayout {
@@ -398,7 +429,7 @@ Rectangle {
                         StyledButton {
                             text: "Init EthClient"
                             onClicked: {
-                                backend.initEthClient(rpcUrlInput.text)
+                                if (root.backend) root.backend.initEthClient(rpcUrlInput.text)
                                 rpcUrlInput.text = ""
                             }
                         }
@@ -410,7 +441,7 @@ Rectangle {
 
                         StyledButton {
                             text: "Refresh List"
-                            onClicked: backend.refreshClients()
+                            onClicked: if (root.backend) root.backend.refreshClients()
                         }
 
                         ResultLabel { text: "Selected EthClient:"; Layout.fillWidth: false }
@@ -418,9 +449,14 @@ Rectangle {
                         ComboBox {
                             id: clientSelector
                             Layout.fillWidth: true
-                            model: ["-- No EthClient Selected --"].concat(backend.clients)
-                            currentIndex: backend.selectedClientIndex + 1
-                            onCurrentIndexChanged: backend.selectedClientIndex = currentIndex - 1
+                            model: root.backend
+                                ? ["-- No EthClient Selected --"].concat(root.backend.clients)
+                                : ["-- No EthClient Selected --"]
+                            currentIndex: root.backend ? root.backend.selectedClientIndex + 1 : 0
+                            onCurrentIndexChanged: {
+                                if (root.backend)
+                                    root.backend.selectedClientIndex = currentIndex - 1
+                            }
                             font.pixelSize: _d.textSize
                             contentItem: Text {
                                 leftPadding: 8
@@ -472,10 +508,11 @@ Rectangle {
 
                         StyledButton {
                             text: "Close Selected"
-                            enabled: backend.selectedClientIndex >= 0
+                            enabled: root.backend && root.backend.selectedClientIndex >= 0
                             onClicked: {
-                                var url = backend.clients[backend.selectedClientIndex]
-                                backend.closeEthClient(url)
+                                if (!root.backend) return
+                                var url = root.backend.clients[root.backend.selectedClientIndex]
+                                root.backend.closeEthClient(url)
                             }
                         }
                     }
@@ -489,22 +526,26 @@ Rectangle {
                     StyledInput {
                         id: rpcMethodInput
                         placeholderText: "Enter RPC Call Method..."
-                        enabled: backend.selectedClientIndex >= 0
+                        enabled: root.backend && root.backend.selectedClientIndex >= 0
                     }
 
                     ResultLabel { text: "Params:" }
                     StyledInput {
                         id: rpcParamsInput
                         placeholderText: "Enter RPC Call Params..."
-                        enabled: backend.selectedClientIndex >= 0
+                        enabled: root.backend && root.backend.selectedClientIndex >= 0
                     }
 
                     StyledButton {
                         text: "RPC Call"
-                        enabled: backend.selectedClientIndex >= 0
+                        enabled: root.backend && root.backend.selectedClientIndex >= 0
                         onClicked: {
-                            var url = backend.clients[backend.selectedClientIndex]
-                            rpcCallResult.text = backend.rpcCall(url, rpcMethodInput.text, rpcParamsInput.text)
+                            var url = root.backend.clients[root.backend.selectedClientIndex]
+                            logos.watch(
+                                root.backend.rpcCall(url, rpcMethodInput.text, rpcParamsInput.text),
+                                function(result) { rpcCallResult.text = result },
+                                function(error) { rpcCallResult.text = "Error: " + error }
+                            )
                         }
                     }
 
@@ -518,10 +559,14 @@ Rectangle {
 
                     StyledButton {
                         text: "Get Chain ID"
-                        enabled: backend.selectedClientIndex >= 0
+                        enabled: root.backend && root.backend.selectedClientIndex >= 0
                         onClicked: {
-                            var url = backend.clients[backend.selectedClientIndex]
-                            chainIdOutput.text = backend.getChainId(url)
+                            var url = root.backend.clients[root.backend.selectedClientIndex]
+                            logos.watch(
+                                root.backend.getChainId(url),
+                                function(result) { chainIdOutput.text = result },
+                                function(error) { chainIdOutput.text = "Error: " + error }
+                            )
                         }
                     }
 
@@ -537,16 +582,20 @@ Rectangle {
                     StyledInput {
                         id: balanceAddressInput
                         placeholderText: "Enter ETH Balance Address..."
-                        enabled: backend.selectedClientIndex >= 0
+                        enabled: root.backend && root.backend.selectedClientIndex >= 0
                     }
 
                     StyledButton {
                         text: "Get ETH Balance"
-                        enabled: backend.selectedClientIndex >= 0
+                        enabled: root.backend && root.backend.selectedClientIndex >= 0
                         onClicked: {
-                            var url = backend.clients[backend.selectedClientIndex]
+                            var url = root.backend.clients[root.backend.selectedClientIndex]
                             balanceAddressOutput.text = balanceAddressInput.text
-                            balanceValueOutput.text = backend.getBalance(url, balanceAddressInput.text)
+                            logos.watch(
+                                root.backend.getBalance(url, balanceAddressInput.text),
+                                function(result) { balanceValueOutput.text = result },
+                                function(error) { balanceValueOutput.text = "Error: " + error }
+                            )
                         }
                     }
 
@@ -569,7 +618,6 @@ Rectangle {
                     width: txScrollView.availableWidth
                     spacing: 12
 
-                    // Transaction Generator
                     SectionHeader { text: "Transaction Generator" }
 
                     ResultLabel {
@@ -762,6 +810,7 @@ Rectangle {
                         text: "Generate Transaction"
                         enabled: txTypeCombo.currentIndex > 0
                         onClicked: {
+                            if (!root.backend) return
                             var txType = _d.txTypes[txTypeCombo.currentIndex].value
 
                             var dynamicParams = {}
@@ -785,7 +834,11 @@ Rectangle {
                                 dynamicParams
                             )
 
-                            txResultOutput.text = backend.generateTransaction(txType, paramsJSON)
+                            logos.watch(
+                                root.backend.generateTransaction(txType, paramsJSON),
+                                function(result) { txResultOutput.text = result },
+                                function(error) { txResultOutput.text = "Error: " + error }
+                            )
                         }
                     }
 
@@ -802,7 +855,14 @@ Rectangle {
 
                     StyledButton {
                         text: "Convert JSON to RLP"
-                        onClicked: jsonToRlpResult.text = backend.jsonToRlp(jsonToRlpInput.text)
+                        onClicked: {
+                            if (!root.backend) return
+                            logos.watch(
+                                root.backend.jsonToRlp(jsonToRlpInput.text),
+                                function(result) { jsonToRlpResult.text = result },
+                                function(error) { jsonToRlpResult.text = "Error: " + error }
+                            )
+                        }
                     }
 
                     ResultLabel { text: "RLP Result:" }
@@ -818,7 +878,14 @@ Rectangle {
 
                     StyledButton {
                         text: "Convert RLP to JSON"
-                        onClicked: rlpToJsonResult.text = backend.rlpToJson(rlpToJsonInput.text)
+                        onClicked: {
+                            if (!root.backend) return
+                            logos.watch(
+                                root.backend.rlpToJson(rlpToJsonInput.text),
+                                function(result) { rlpToJsonResult.text = result },
+                                function(error) { rlpToJsonResult.text = "Error: " + error }
+                            )
+                        }
                     }
 
                     ResultLabel { text: "JSON Result:" }
@@ -834,7 +901,14 @@ Rectangle {
 
                     StyledButton {
                         text: "Get Transaction Hash"
-                        onClicked: getHashResult.text = backend.getHash(getHashInput.text)
+                        onClicked: {
+                            if (!root.backend) return
+                            logos.watch(
+                                root.backend.getHash(getHashInput.text),
+                                function(result) { getHashResult.text = result },
+                                function(error) { getHashResult.text = "Error: " + error }
+                            )
+                        }
                     }
 
                     ResultLabel { text: "Hash Result:" }
