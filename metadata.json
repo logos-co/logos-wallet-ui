@@ -1,19 +1,24 @@
 {
   "name": "wallet_ui",
   "version": "1.0.0",
-  "type": "ui",
+  "type": "ui_qml",
   "category": "wallet",
   "description": "Wallet interface for the Logos application",
   "main": "wallet_ui_plugin",
   "icon": "src/icons/wallet.png",
+  "view": "qml/WalletView.qml",
   "dependencies": ["wallet_module"],
-
   "nix": {
     "packages": {
       "build": [],
       "runtime": ["qt6.qtdeclarative", "zstd", "krb5", "abseil-cpp"]
     },
     "external_libraries": [],
-    "cmake": { "find_packages": [], "extra_sources": [] }
+    "cmake": {
+      "find_packages": [],
+      "extra_sources": [],
+      "extra_include_dirs": [],
+      "extra_link_libraries": []
+    }
   }
 }
